@@ -16,7 +16,7 @@ fn main() {
                 println!("2. Goes to Side2");
                 println!("3. Goes to Side3");
                 println!("4. Goes to End");
-                println!("L always goes to End");
+                println!("L and l always goes to End");
                 menu.switch4(Menu::Side1, Menu::Side2, Menu::Side3, Menu::End);
             }
             Menu::Side1 => {
@@ -24,26 +24,28 @@ fn main() {
                 println!("1. Goes to Side2");
                 println!("2. Goes to Main");
                 println!("3. Goes to End");
-                println!("L always goes to End");
                 menu.switch3(Menu::Side2, Menu::Main, Menu::End);
             }
             Menu::Side2 => {
                 println!("This is Side menu 2.");
                 println!("1. Goes to Side3");
                 println!("2. Goes to Main");
-                println!("L always goes to End");
                 menu.switch2(Menu::Side3, Menu::Main);
             }
             Menu::Side3 => {
                 println!("This is Side menu 3.");
                 println!("1. Goes to Main");
-                println!("L always goes to End");
                 menu.switch1(Menu::Main);
             }
             Menu::End => {
-                // engine = false;
                 println!("This is the end.");
                 break 'engine;
+            }
+            Menu::Error => {
+                println!("An error occured. Return to main?");
+                println!("1. Goes to Main");
+                println!("2. Goes to End");
+                menu.switch2(Menu::Main, Menu::End);
             }
         }
     }
