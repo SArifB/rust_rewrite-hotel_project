@@ -1,6 +1,6 @@
 #![allow(unused)]
-use core::fmt::Debug;
-use std::io;
+use clearscreen::ClearScreen::Cls;
+use std::{fmt::Debug, io, str::FromStr};
 
 pub enum Menu {
     Main,
@@ -8,12 +8,14 @@ pub enum Menu {
     Side2,
     Side3,
     End,
+    Error,
 }
 
 impl Menu {
-    fn rin_char() -> char {
+    pub fn get_command() -> char {
+        // Create a buffer and read new input
         let mut input = String::new();
-        // Create and read new input
+
         io::stdin()
             .read_line(&mut input)
             .expect("Failed to read user input");
@@ -21,91 +23,81 @@ impl Menu {
             .trim()
             .parse()
             .expect("Failed to parse user input as char");
+
+        // Clear the screen
+        Cls.clear().expect("failed to clear the screen");
         input
     }
 
-    fn clear_screen() {
-        // Clear the screen
-        clearscreen::ClearScreen::Cls
-            .clear()
-            .expect("failed to clear the screen");
+    pub fn rin<T>(input: &mut T)
+    where
+        T: FromStr + Debug,
+        <T as FromStr>::Err: Debug,
+    {
+        let mut input_string = String::new();
+
+        io::stdin()
+            .read_line(&mut input_string)
+            .expect("Failed to read user input");
+        *input = input_string
+            .trim()
+            .parse()
+            .expect("Failed to parse user input");
     }
 
-    pub fn switch(&mut self, condition: Menu) {
-        // Switch Menu without arguments
-        *self = condition;
+    //--------------------------------------------------------------------------------------------
+    // The number in function name indicates the amount of choices for user switching
 
+    // Switch Self without command
+    pub fn switch0(&mut self, cond: Self) {
+        *self = cond;
         // Clear the screen
-        Self::clear_screen();
+        Cls.clear().expect("failed to clear the screen");
     }
 
-    pub fn switch1(&mut self, condition1: Menu) {
-        // Create and read new input
-        let input = Self::rin_char();
-
-        // Match input to predisposed commands
-        match input {
-            '1' => *self = condition1,
-            'l' => *self = Menu::End,
-            'L' => *self = Menu::End,
-            _ => *self = Menu::End,
+    pub fn switch1(&mut self, cond1: Self) {
+        // Read and match input to command
+        match Self::get_command() {
+            '1' => *self = cond1,
+            'l' => *self = Self::End,
+            'L' => *self = Self::End,
+            _ => *self = Self::Error,
         }
-
-        // Clear the screen
-        Self::clear_screen();
     }
 
-    pub fn switch2(&mut self, condition1: Menu, condition2: Menu) {
-        // Create and read new input
-        let input = Self::rin_char();
-
-        // Match input to predisposed commands
-        match input {
-            '1' => *self = condition1,
-            '2' => *self = condition2,
-            'l' => *self = Menu::End,
-            'L' => *self = Menu::End,
-            _ => *self = Menu::End,
+    pub fn switch2(&mut self, cond1: Self, cond2: Self) {
+        // Read and match input to command
+        match Self::get_command() {
+            '1' => *self = cond1,
+            '2' => *self = cond2,
+            'l' => *self = Self::End,
+            'L' => *self = Self::End,
+            _ => *self = Self::Error,
         }
-
-        // Clear the screen
-        Self::clear_screen();
     }
 
-    pub fn switch3(&mut self, condition1: Menu, condition2: Menu, condition3: Menu) {
-        // Create and read new input
-        let input = Self::rin_char();
-
-        // Match input to predisposed commands
-        match input {
-            '1' => *self = condition1,
-            '2' => *self = condition2,
-            '3' => *self = condition3,
-            'l' => *self = Menu::End,
-            'L' => *self = Menu::End,
-            _ => *self = Menu::End,
+    pub fn switch3(&mut self, cond1: Self, cond2: Self, cond3: Self) {
+        // Read and match input to command
+        match Self::get_command() {
+            '1' => *self = cond1,
+            '2' => *self = cond2,
+            '3' => *self = cond3,
+            'l' => *self = Self::End,
+            'L' => *self = Self::End,
+            _ => *self = Self::Error,
         }
-
-        // Clear the screen
-        Self::clear_screen();
     }
 
-    pub fn switch4(&mut self, cond1: Menu, cond2: Menu, cond3: Menu, cond4: Menu) {
-        // Create and read new input
-        let input = Self::rin_char();
-
-        // Match input to predisposed commands
-        match input {
+    pub fn switch4(&mut self, cond1: Self, cond2: Self, cond3: Self, cond4: Self) {
+        // Read and match input to command
+        match Self::get_command() {
             '1' => *self = cond1,
             '2' => *self = cond2,
             '3' => *self = cond3,
             '4' => *self = cond4,
-            'l' => *self = Menu::End,
-            'L' => *self = Menu::End,
-            _ => *self = Menu::End,
+            'l' => *self = Self::End,
+            'L' => *self = Self::End,
+            _ => *self = Self::Error,
         }
-
-        // Clear the screen
-        Self::clear_screen();
     }
 }
