@@ -1,46 +1,56 @@
 #![allow(unused)]
-use rand::{thread_rng, Rng};
+use std::vec;
+
+use rand::{distributions::Uniform, thread_rng, Rng};
 
 pub struct Hotel {
-    hotel_size: usize,
+    total_size: u32,
     availability: Vec<bool>,
-    capacity: Vec<usize>,
-    price: Vec<usize>,
-    reservation_num: Vec<usize>,
+    capacity: Vec<u32>,
+    price: Vec<u32>,
+    reservation_num: Vec<u32>,
     guest_name: Vec<String>,
     guest_email: Vec<String>,
 }
 
 impl Hotel {
     pub fn new() -> Self {
-        // RNG thread
+        // RNG
         let mut rng = thread_rng();
+        let res_num_range = Uniform::new(10_000, 100_000);
 
-        // Hotel size
-        let hotel_size: usize = {
-            let mut num = rng.gen_range(5..10);
+        // Generates size
+        let total_size: u32 = {
+            let mut num = rng.gen_range(5..=10);
             if num & 1 == 1 {
                 num += 1
             }
             num
         };
-
-        // Rest of the variables
-        let availability: Vec<bool> = vec![rng.gen(); hotel_size];
-        let capacity: Vec<usize> = vec![if rng.gen() { 1 } else { 2 }; hotel_size];
-        let price: Vec<usize> = capacity
+        // Generates availabity
+        let availability: Vec<bool> = (0..total_size).map(|_| rng.gen_bool(0.5)).collect();
+        // Generates capacity
+        let capacity: Vec<u32> = (0..total_size)
+            .map(|_| if rng.gen_bool(0.5) { 1 } else { 2 })
+            .collect();
+        // Generates price based on capacity
+        let price: Vec<u32> = capacity
             .iter()
-            .map(|x| if *x == 1 { 100 } else { 150 })
+            .map(|&x| if x == 1 { 100 } else { 150 })
             .collect();
-        let reservation_num: Vec<usize> = (0..hotel_size)
-            .map(|_| rng.gen_range(10_000..100_000))
-            .collect();
-        let guest_name: Vec<String> = vec![String::new(); hotel_size];
-        let guest_email: Vec<String> = vec![String::new(); hotel_size];
+        // Generates reservation numbers
+        let reservation_num: Vec<u32> =
+            (0..total_size).map(|_| rng.sample(res_num_range)).collect();
+        // Creates an empty String vector
+        let guest_name: Vec<String> = Vec::with_capacity(total_size as usize);
+        // let guest_name: Vec<String> = vec![String::new(); total_size as usize];
+        // Creates an empty String vector
+        let guest_email: Vec<String> = Vec::with_capacity(total_size as usize);
+        // let guest_email: Vec<String> = vec![String::new(); total_size as usize];
 
         // Return Self
         Self {
-            hotel_size,
+            total_size,
             availability,
             capacity,
             price,
@@ -52,23 +62,22 @@ impl Hotel {
 
     //--------------------------------------------------------------------------------------------
 
-    pub fn reserve_room(&mut self, room_choice: usize, guest_name: &str, guest_email: &str) {
-        self.availability[room_choice - 1] = false;
-        self.guest_name[room_choice - 1] = guest_name.to_string();
-        self.guest_email[room_choice - 1] = guest_email.to_string();
+    pub fn reserve_room(&mut self, room_choice: u32, guest_name: &str, guest_email: &str) {
+        self.availability[room_choice as usize - 1] = false;
+        self.guest_name[room_choice as usize - 1] = guest_name.to_string();
+        self.guest_email[room_choice as usize - 1] = guest_email.to_string();
     }
 
-    pub fn free_room(&mut self, room_choice: usize) {
-        self.availability[room_choice - 1] = true;
-        self.guest_name[room_choice - 1] = String::new();
-        self.guest_email[room_choice - 1] = String::new();
+    pub fn free_room(&mut self, room_choice: u32) {
+        self.availability[room_choice as usize - 1] = true;
+        self.guest_name[room_choice as usize - 1] = String::new();
+        self.guest_email[room_choice as usize - 1] = String::new();
     }
 
     //--------------------------------------------------------------------------------------------
 
-    pub fn generate_discount() -> usize {
-        // let rand_num = thread_rng().gen_range(1..=10);
-        let rand_num = Self::random_value(1, 10);
+    pub fn generate_discount() -> u32 {
+        let rand_num = thread_rng().gen_range(1..=10);
         match rand_num {
             1..=2 => 2,
             3..=5 => 1,
@@ -77,46 +86,44 @@ impl Hotel {
         }
     }
 
-    pub fn calculate_price(&self, room_choice: usize, nights: usize, discount: usize) -> f64 {
+    pub fn calculate_price(&self, room_choice: u32, nights: u32, discount: u32) -> f32 {
         match discount {
-            2 => self.price[room_choice] as f64 * nights as f64 * 0.8,
-            1 => self.price[room_choice] as f64 * nights as f64 * 0.9,
-            0 => self.price[room_choice] as f64 * nights as f64,
+            2 => self.price[room_choice as usize - 1] as f32 * nights as f32 * 0.8,
+            1 => self.price[room_choice as usize - 1] as f32 * nights as f32 * 0.9,
+            0 => self.price[room_choice as usize - 1] as f32 * nights as f32,
             _ => panic!(),
         }
     }
 
     //--------------------------------------------------------------------------------------------
 
-    pub fn find_room_num_bsd(&self, reservation_num: usize) {
+    pub fn find_room_num_based(&self, reservation_num: u32) {
         for (i, n) in self.reservation_num.iter().enumerate() {
             if reservation_num == *n {
-                println!("Your reservation number is {}", i + 1);
+                println!("Your room number is {}", i + 1);
             }
         }
     }
 
-    pub fn find_room_name_bsd(&self, guest_name: &str) {
+    pub fn find_room_name_based(&self, guest_name: &str) {
         for (i, n) in self.guest_name.iter().enumerate() {
             if guest_name == *n {
-                println!("Your reservation number is {}", i + 1);
+                println!("Your room number is {}", i + 1);
             }
         }
     }
 
     //--------------------------------------------------------------------------------------------
 
-    pub fn count_free_rooms(&self) -> usize {
+    pub fn count_free_rooms(&self) -> u32 {
         let mut counter = 0;
-        for i in self.availability.iter() {
+        for i in &self.availability {
             if *i {
                 counter += 1;
             }
         }
         counter
     }
-
-    //--------------------------------------------------------------------------------------------
 
     pub fn print_free_rooms(&self) {
         println!("Room\tAvailability\tPrice\tReservation number\n");
@@ -134,14 +141,14 @@ impl Hotel {
 
     //--------------------------------------------------------------------------------------------
 
-    pub fn print_reservation_num(&self, room_choice: usize) {
+    pub fn print_reservation_num(&self, room_choice: u32) {
         println!(
             "Your reservation number is {}.",
-            self.reservation_num[room_choice - 1]
+            self.reservation_num[room_choice as usize - 1]
         )
     }
 
-    pub fn print_discount(&self, room_choice: usize, discount: usize) {
+    pub fn print_discount(&self, room_choice: u32, discount: u32) {
         if discount == 2 {
             println!("Congratulations! You have won a 20% discount.")
         } else if discount == 1 {
@@ -149,8 +156,8 @@ impl Hotel {
         }
     }
 
-    pub fn print_room_capacity(&self, room_choice: usize) {
-        if self.capacity[room_choice - 1] == 2 {
+    pub fn print_room_capacity(&self, room_choice: u32) {
+        if self.capacity[room_choice as usize - 1] == 2 {
             println!("You have chosen a two person room.")
         } else {
             println!("You have chosen a one person room.")
@@ -159,39 +166,33 @@ impl Hotel {
 
     //--------------------------------------------------------------------------------------------
 
-    pub fn check_rand_room_ava(&self) -> usize {
-        let mut rand_num: usize = 0;
+    pub fn check_rand_room_availability(&self) -> u32 {
+        let mut rand_num: u32 = 0;
         let mut rng = thread_rng();
+        let range = Uniform::new(0, self.total_size);
 
-        for i in self.availability.iter() {
-            if *i {
-                // rand_num = Self::random_value(0, self.hotel_size as usize - 1);
-                rand_num = rng.gen_range(0..self.hotel_size);
+        for _ in &self.availability {
+            rand_num = rng.sample(range);
+            if self.availability[rand_num as usize] {
                 return rand_num + 1;
             }
         }
         rand_num
     }
 
-    pub fn check_ava(&self, room_choice: usize) -> bool {
-        if self.availability[room_choice - 1] {
+    pub fn check_selected_room_availability(&self, room_choice: u32) -> bool {
+        if self.availability[room_choice as usize - 1] {
             return true;
         }
         false
     }
 
-    pub fn check_cancel(&self, room_choice: usize, guest_name: &str) -> bool {
-        if !self.availability[room_choice - 1] && self.guest_name[room_choice - 1] == guest_name {
+    pub fn check_cancelabilty(&self, room_choice: u32, guest_name: &str) -> bool {
+        if !self.availability[room_choice as usize - 1]
+            && self.guest_name[room_choice as usize - 1] == guest_name
+        {
             return true;
         }
         false
-    }
-
-    //--------------------------------------------------------------------------------------------
-
-    fn random_value(floor: usize, ceil: usize) -> usize {
-        // let mut thread_rng = thread_rng();
-        let rand_num: usize = thread_rng().gen_range(floor..=ceil);
-        rand_num
     }
 }
