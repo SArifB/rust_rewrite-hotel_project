@@ -2,6 +2,7 @@
 use std::vec;
 
 use rand::{distributions::Uniform, thread_rng, Rng};
+use std::collections::HashSet;
 
 pub struct Hotel {
     total_size: u32,
@@ -19,7 +20,7 @@ impl Hotel {
         let mut rng = thread_rng();
         let res_num_range = Uniform::new(10_000, 100_000);
 
-        // Generates size
+        // Generates an even total size
         let total_size: u32 = {
             let mut num = rng.gen_range(5..=10);
             if num & 1 == 1 {
@@ -27,26 +28,36 @@ impl Hotel {
             }
             num
         };
+
         // Generates availabity
         let availability: Vec<bool> = (0..total_size).map(|_| rng.gen_bool(0.5)).collect();
         // Generates capacity
         let capacity: Vec<u32> = (0..total_size)
-            .map(|_| if rng.gen_bool(0.5) { 1 } else { 2 })
+            .map(|x| if x < (total_size / 2) { 1 } else { 2 })
             .collect();
         // Generates price based on capacity
         let price: Vec<u32> = capacity
             .iter()
             .map(|&x| if x == 1 { 100 } else { 150 })
             .collect();
-        // Generates reservation numbers
-        let reservation_num: Vec<u32> =
-            (0..total_size).map(|_| rng.sample(res_num_range)).collect();
+        // Generates reservation numbers and checks if there are repeats
+        let mut used_res_values = HashSet::with_capacity(total_size as usize);
+        let reservation_num: Vec<u32> = (0..total_size)
+            .map(|_| {
+                let random_value = rng.sample(res_num_range);
+                if used_res_values.insert(random_value) {
+                    random_value
+                } else {
+                    0
+                }
+            })
+            .filter(|&x| x != 0)
+            .take(total_size as usize)
+            .collect();
         // Creates an empty String vector
-        let guest_name: Vec<String> = Vec::with_capacity(total_size as usize);
-        // let guest_name: Vec<String> = vec![String::new(); total_size as usize];
+        let guest_name: Vec<String> = vec![String::new(); total_size as usize];
         // Creates an empty String vector
-        let guest_email: Vec<String> = Vec::with_capacity(total_size as usize);
-        // let guest_email: Vec<String> = vec![String::new(); total_size as usize];
+        let guest_email: Vec<String> = vec![String::new(); total_size as usize];
 
         // Return Self
         Self {
