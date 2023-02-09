@@ -1,4 +1,5 @@
 #![allow(unused)]
+use anyhow::Result;
 use clearscreen::ClearScreen::Cls;
 use std::{fmt::Debug, io, str::FromStr};
 
@@ -12,21 +13,19 @@ pub enum Menu {
 }
 
 impl Menu {
-    pub fn get_command() -> char {
+    pub fn get_command() -> Result<char> {
         // Create a buffer and read new input
         let mut input = String::new();
 
         io::stdin()
             .read_line(&mut input)
             .expect("Failed to read user input");
-        let input: char = input
-            .trim()
-            .parse()
-            .expect("Failed to parse user input as char");
+        let input: char = input.trim().parse()?;
+        // .expect("Failed to parse user input as char");
 
         // Clear the screen
         Cls.clear().expect("failed to clear the screen");
-        input
+        Ok(input)
     }
 
     pub fn rin<T>(input: &mut T)
@@ -56,8 +55,12 @@ impl Menu {
     }
 
     pub fn switch1(&mut self, cond1: Self) {
+        let input = match Self::get_command() {
+            Ok(x) => x,
+            Err(_) => 'x',
+        };
         // Read and match input to command
-        match Self::get_command() {
+        match input {
             '1' => *self = cond1,
             'l' => *self = Self::End,
             'L' => *self = Self::End,
@@ -66,8 +69,12 @@ impl Menu {
     }
 
     pub fn switch2(&mut self, cond1: Self, cond2: Self) {
+        let input = match Self::get_command() {
+            Ok(x) => x,
+            Err(_) => 'x',
+        };
         // Read and match input to command
-        match Self::get_command() {
+        match input {
             '1' => *self = cond1,
             '2' => *self = cond2,
             'l' => *self = Self::End,
@@ -77,8 +84,12 @@ impl Menu {
     }
 
     pub fn switch3(&mut self, cond1: Self, cond2: Self, cond3: Self) {
+        let input = match Self::get_command() {
+            Ok(x) => x,
+            Err(_) => 'x',
+        };
         // Read and match input to command
-        match Self::get_command() {
+        match input {
             '1' => *self = cond1,
             '2' => *self = cond2,
             '3' => *self = cond3,
@@ -89,8 +100,12 @@ impl Menu {
     }
 
     pub fn switch4(&mut self, cond1: Self, cond2: Self, cond3: Self, cond4: Self) {
+        let input = match Self::get_command() {
+            Ok(x) => x,
+            Err(_) => 'x',
+        };
         // Read and match input to command
-        match Self::get_command() {
+        match input {
             '1' => *self = cond1,
             '2' => *self = cond2,
             '3' => *self = cond3,
