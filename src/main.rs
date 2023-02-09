@@ -42,7 +42,7 @@ fn main() {
                 break 'engine;
             }
             Menu::Error => {
-                println!("An error occured. Return to main?");
+                println!("\nAn error occured. Return to main?");
                 println!("1. Goes to Main");
                 println!("2. Goes to End");
                 menu.switch2(Menu::Main, Menu::End);
