@@ -1,4 +1,4 @@
-#![allow(unused)]
+#![allow(dead_code)]
 
 use rand::{ distributions::Uniform, thread_rng, Rng };
 use std::collections::HashSet;
@@ -172,7 +172,7 @@ impl Hotel {
     )
   }
 
-  pub fn print_discount(&self, room_choice: u32, discount: u32) {
+  pub fn print_discount(&self, discount: u32) {
     if discount == 2 {
       println!("Congratulations! You have won a 20% discount.")
     } else if discount == 1 {
