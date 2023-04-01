@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use clearscreen::ClearScreen::Cls;
+use console::Term;
 use std::io;
 
 #[derive(Default)]
@@ -21,11 +21,15 @@ impl Menu {
       io::stdin().read_line(&mut input).unwrap_or_default();
       // Clear the screen and return input
       if let Ok(val) = input.trim().parse() {
-        Cls.clear().unwrap_or_default();
+        Self::clear_screen();
         return val;
       }
       println!("Invalid input, try again.");
     }
+  }
+
+  pub fn clear_screen() {
+    Term::stdout().clear_screen().expect("failed to clear the screen");
   }
 
   //--------------------------------------------------------------------------------------------
@@ -34,8 +38,7 @@ impl Menu {
   // Switch Self without command
   pub fn switch0(&mut self, cond: Self) {
     *self = cond;
-    // Clear the screen
-    Cls.clear().expect("failed to clear the screen");
+    Self::clear_screen();
   }
 
   pub fn switch1(&mut self, cond1: Self) {

@@ -11,6 +11,7 @@ fn main() {
   let mut _hotel = Hotel::new();
   let mut _user = User::default();
 
+  Menu::clear_screen();
   'engine: loop {
     match menu {
       Menu::Main => {
